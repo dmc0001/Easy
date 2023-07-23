@@ -31,14 +31,14 @@
         app:layout_constraintTop_toBottomOf="@+id/etPasswordLabel" />
 
     <TextView
-        android:id="@+id/tvRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Don't have an account? Register"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+    android:id="@+id/tvRegister"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Don't have an account? Register"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -75,5 +75,16 @@
             android:hint="Password"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/tvForgetPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forget password? "
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
