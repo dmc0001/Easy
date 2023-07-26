@@ -5,8 +5,8 @@ data class User(
     val lastName :String,
     val email:String,
     val phoneNumber :String,
-    val role :String,
-    val imagePath :String
+    val role :String = "",
+    val imagePath :String =""
 )
 {
     constructor() : this("","","","","","")

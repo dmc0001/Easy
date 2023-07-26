@@ -6,19 +6,16 @@ import com.anyandroid.easy.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) :
     ViewModel() {
-    private val _register = MutableStateFlow<Resource<FirebaseUser>>(Resource.Loading())
+    private val _register = MutableStateFlow<Resource<FirebaseUser>>(Resource.Unspecified())
     val register: Flow<Resource<FirebaseUser>> = _register
 
 
@@ -40,7 +37,10 @@ class RegisterViewModel @Inject constructor(private val firebaseAuth: FirebaseAu
         }
     }
 
-    fun createAccountWithNumberPhone(user: User, password: String) {
+    fun createAccountWithEmailAndPassword(user: User, password: String) {
+        runBlocking {
+            _register.emit(Resource.Loading())
+        }
         firebaseAuth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener { it ->
                 it.user?.let {
