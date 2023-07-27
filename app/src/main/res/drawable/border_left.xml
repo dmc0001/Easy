@@ -1,0 +1,20 @@
+<!-- border_left.xml -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background shape -->
+    <item android:drawable="@android:color/transparent" />
+
+    <!-- Left border shape -->
+    <item
+        android:left="4dp"
+        android:top="0dp"
+        android:right="0dp"
+        android:bottom="0dp">
+        <shape>
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="2dp"
+                android:color="@android:color/black" />
+        </shape>
+    </item>
+</layer-list>
