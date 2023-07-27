@@ -10,10 +10,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.anyandroid.easy.data.User
 import com.anyandroid.easy.databinding.FragmentRegisterBinding
+import com.anyandroid.easy.util.RegisterValidation
 import com.anyandroid.easy.util.Resource
 import com.anyandroid.easy.viewmodel.RegisterViewModel
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 private const val TAG = "RegisterFragment"
@@ -42,18 +44,14 @@ class RegisterFragment : Fragment() {
                 val email = etEmail.text.toString().trim()
                 val phoneNumber = etPhoneNumberRegister.text.toString().trim()
                 val password = etPasswordRegister.text.toString()
-
-                // Perform input validation here before creating the User object
-
-                if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || password.isEmpty()) {
-                    // Show an error message or handle empty input fields
-                    Snackbar.make(it, "Please fill in all fields", Snackbar.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
                 val user = User(firstName, lastName, email, phoneNumber)
+                viewModelRegister.createAccountWithEmailAndPassword(
+                    user,
+                    password,
+                    firstName,
+                    lastName
+                )
 
-                viewModelRegister.createAccountWithEmailAndPassword(user, password)
             }
         }
         lifecycleScope.launchWhenStarted {
@@ -74,7 +72,43 @@ class RegisterFragment : Fragment() {
                 }
             }
         }
-    }
+        lifecycleScope.launchWhenStarted {
+            viewModelRegister.validation.collect { validation ->
+                if (validation.email is RegisterValidation.Failed) {
+                    withContext(Dispatchers.Main) {
+                        binding.etEmail.apply {
+                            requestFocus()
+                            error = validation.email.message
 
+                        }
+                    }
+                }
+                if (validation.password is RegisterValidation.Failed) {
+                    withContext(Dispatchers.Main) {
+                        binding.etPasswordRegister.apply {
+                            requestFocus()
+                            error = validation.password.message
+                        }
+                    }
+                }
+                if (validation.firstname is RegisterValidation.Failed) {
+                    withContext(Dispatchers.Main) {
+                        binding.etFirstName.apply {
+                            requestFocus()
+                            error = validation.firstname.message
+                        }
+                    }
+                }
+                if (validation.lastname is RegisterValidation.Failed) {
+                    withContext(Dispatchers.Main) {
+                        binding.etLastName.apply {
+                            requestFocus()
+                            error = validation.lastname.message
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
