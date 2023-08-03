@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_phoneAuthFragment"
+            app:destination="@id/phoneAuthFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -44,4 +47,10 @@
             android:id="@+id/action_accountOptionFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/phoneAuthFragment"
+        android:name="com.anyandroid.easy.fragments.PhoneAuthFragment"
+        android:label="PhoneAuthFragment"
+        tools:layout="@layout/fragment_phone_auth"
+        />
 </navigation>

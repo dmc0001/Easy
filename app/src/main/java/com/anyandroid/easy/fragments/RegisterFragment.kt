@@ -8,10 +8,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
+import com.anyandroid.easy.R
 import com.anyandroid.easy.data.User
 import com.anyandroid.easy.databinding.FragmentRegisterBinding
 import com.anyandroid.easy.util.RegisterValidation
 import com.anyandroid.easy.util.Resource
+import com.anyandroid.easy.viewmodel.PhoneAuthViewModel
 import com.anyandroid.easy.viewmodel.RegisterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +27,7 @@ private const val TAG = "RegisterFragment"
 class RegisterFragment : Fragment() {
     private lateinit var binding: FragmentRegisterBinding
     private val viewModelRegister by viewModels<RegisterViewModel>()
+    private val viewModelPhoneAuth by viewModels<PhoneAuthViewModel>()
 
 
     override fun onCreateView(
@@ -40,17 +44,19 @@ class RegisterFragment : Fragment() {
         binding.apply {
             btnRegister.setOnClickListener {
                 val firstName = etFirstName.text.toString().trim()
-                val lastName = etLastName.text.toString().trim()
-                val email = etEmail.text.toString().trim()
-                val phoneNumber = etPhoneNumberRegister.text.toString().trim()
-                val password = etPasswordRegister.text.toString()
-                val user = User(firstName, lastName, email, phoneNumber)
-                viewModelRegister.createAccountWithEmailAndPassword(
-                    user,
-                    password,
-                    firstName,
-                    lastName
-                )
+                 val lastName = etLastName.text.toString().trim()
+                 val email = etEmail.text.toString().trim()
+                val cc = ccp.selectedCountryCodeWithPlus
+                val number =etPhoneNumberRegister.text.toString().trim()
+                 val phoneNumber =  "$cc$number"
+                 val password = etPasswordRegister.text.toString()
+                 val user = User(firstName, lastName, email, phoneNumber)
+                 // Proceed with the registration process using RegisterViewModel
+                 viewModelPhoneAuth.sendVerificationCode(phoneNumber,requireActivity())
+                 viewModelRegister.createAccountWithEmailAndPassword(
+                     user,
+                     password
+                 )
 
             }
         }
@@ -63,6 +69,8 @@ class RegisterFragment : Fragment() {
                     is Resource.Success -> {
                         Log.d("test", it.data.toString())
                         binding.btnRegister.revertAnimation()
+                        Navigation.findNavController(view)
+                            .navigate(R.id.action_registerFragment_to_phoneAuthFragment)
                     }
                     is Resource.Error -> {
                         Log.d(TAG, it.message.toString())
@@ -104,6 +112,14 @@ class RegisterFragment : Fragment() {
                         binding.etLastName.apply {
                             requestFocus()
                             error = validation.lastname.message
+                        }
+                    }
+                }
+                if (validation.phoneNumber is RegisterValidation.Failed) {
+                    withContext(Dispatchers.Main) {
+                        binding.etPhoneNumberRegister.apply {
+                            requestFocus()
+                            error = validation.phoneNumber.message
                         }
                     }
                 }

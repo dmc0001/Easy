@@ -7,12 +7,12 @@ import com.anyandroid.easy.util.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,26 +24,11 @@ class RegisterViewModel @Inject constructor(private val firebaseAuth: FirebaseAu
     val validation = _validation.receiveAsFlow()
 
 
-    fun createAccountWithNumberPhone2(user: User, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val authResult = firebaseAuth.createUserWithEmailAndPassword(
-                    user.email,
-                    password
-                ).await()
-                withContext(Dispatchers.Main) {
-                    authResult.user?.let { _register.value = Resource.Success(it) }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    _register.value = Resource.Error(e.message.toString())
-                }
-            }
-        }
-    }
-
-    fun createAccountWithEmailAndPassword(user: User, password: String,firstname:String,lastname:String) {
-        if (checkValidation(user, password,firstname,lastname)) {
+    fun createAccountWithEmailAndPassword(
+        user: User,
+        password: String
+    ) {
+        if (checkValidation(user, password)) {
             runBlocking {
                 _register.emit(Resource.Loading())
             }
@@ -59,23 +44,29 @@ class RegisterViewModel @Inject constructor(private val firebaseAuth: FirebaseAu
             val registerFieldState = RegisterFieldsState(
                 validEmail(user.email),
                 validPassword(password),
-                validFirstName(firstname),
-                validLastName(lastname)
+                validFirstName(user.firstName),
+                validLastName(user.lastName),
+                validPhoneNumber(user.phoneNumber)
             )
             viewModelScope.launch {
                 _validation.send(registerFieldState)
             }
         }
     }
-
-    private fun checkValidation(user: User, password: String,firstname: String,lastname: String): Boolean {
+    private fun checkValidation(
+        user: User,
+        password: String,
+    ): Boolean {
         val emailValidation = validEmail(user.email)
         val passwordValidation = validPassword(password)
-        val firstNameValidation = validFirstName(firstname)
-        val lastnameValidation = validLastName(lastname)
-        val shouldRegister =
-            emailValidation is RegisterValidation.Success && passwordValidation is RegisterValidation.Success
-        return shouldRegister
+        val firstNameValidation = validFirstName(user.firstName)
+        val lastnameValidation = validLastName(user.lastName)
+        val phoneNumberValidation = validPhoneNumber(user.phoneNumber)
+        return (emailValidation is RegisterValidation.Success
+                && passwordValidation is RegisterValidation.Success
+                && lastnameValidation is RegisterValidation.Success
+                && firstNameValidation is RegisterValidation.Success
+                && phoneNumberValidation is RegisterValidation.Success)
     }
 
 }
