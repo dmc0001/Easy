@@ -8,5 +8,6 @@ data class RegisterFieldsState(
     val email : RegisterValidation,
     val password :RegisterValidation,
     val firstname:RegisterValidation,
-    val lastname:RegisterValidation
+    val lastname:RegisterValidation,
+    val phoneNumber:RegisterValidation
 )

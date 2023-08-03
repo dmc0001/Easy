@@ -31,3 +31,28 @@ fun validPassword(password: String): RegisterValidation {
         return RegisterValidation.Failed("Password should contains 6 char at least")
     return RegisterValidation.Success
 }
+
+fun validPhoneNumber(phone: String): RegisterValidation {
+    if (phone.isEmpty())
+        return RegisterValidation.Failed("Phone number is required!")
+    else if (!Patterns.PHONE.matcher(phone).matches() || phone.length < 11)
+
+        return RegisterValidation.Failed("Need valid phone number!")
+
+    return RegisterValidation.Success
+}
+
+fun validOTP(
+    c1: String,
+    c2: String,
+    c3: String,
+    c4: String,
+    c5: String,
+    c6: String
+): VerificationOTPValidation {
+
+    if (c1.isEmpty() || c2.isEmpty() || c3.isEmpty() || c4.isEmpty() || c5.isEmpty() || c6.isEmpty()) {
+        return VerificationOTPValidation.Failed("OTP is not valid!")
+    }
+    return VerificationOTPValidation.Success
+}
